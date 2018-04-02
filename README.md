@@ -6,7 +6,8 @@ Rearrange Tabs is a tiny Google Chrome Extension that allows users
 to rearrange the position of the tabs in a window by moving them
 around using keyboard shortcuts.
 
-Rearrange Tabs has been featured on [LifeHacker](http://lifehacker.com/this-extension-rearranges-chrome-tabs-with-keyboard-sho-1791622486) and [Changelog](http://email.changelog.com/t/t-9A7FDF4C536D63BF) :smile:
+Rearrange Tabs is originally by Mohinsh Thallavajhula, this version
+has been customized by Shaun Clowes
 
 - To move a tab to its left
 
@@ -18,20 +19,26 @@ Rearrange Tabs has been featured on [LifeHacker](http://lifehacker.com/this-exte
   - `Mac`: <kbd>Ctrl</kbd>-<kbd>Shift</kbd>-<kbd>Right</kbd>
   - `Windows`: <kbd>Shift</kbd>-<kbd>Alt</kbd>-<kbd>Right</kbd>
 
+- To move a tab to the start of the tab list
+
+  - `Mac`: <kbd>Ctrl</kbd>-<kbd>Shift</kbd>-<kbd>1</kbd>
+  - `Windows`: <kbd>Shift</kbd>-<kbd>Alt</kbd>-<kbd>1</kbd>
+
 It's as simple as that. Here's how it looks like: [https://www.youtube.com/watch?v=A1X3geKtF8A](https://www.youtube.com/watch?v=A1X3geKtF8A)
 
 Here's the introduction blog post: [https://iam.mt/rearrange-tabs](https://iam.mt/rearrange-tabs)
 
-Shortcuts are configurable via `chrome://extensions` page.
+Shortcuts are configurable via `chrome://extensions/shortcuts` page.
 
 ## Installation
 
-Install the extension by visiting this Chrome Web Store link: **[Chrome Web Store](https://chrome.google.com/webstore/detail/rearrange-tabs/ccnnhhnmpoffieppjjkhdakcoejcpbga)**
+Install the extension by loading it unpacked
 
 ## Customize Shortcut
 
-1. Go to `chrome://extensions` and scroll to the bottom of the page.
-3. Click on `Keyboard shortcuts` to open `Keyboard Shortcuts for Extensions and Apps`.
+1. Go to `chrome://extensions` 
+2. Click the 'hamburger' menu at the top left
+3. Click on `Keyboard shortcuts` 
 4. Scroll down to locate `Rearrange Tabs`.
 5. Click in the greyed out fields for `Not set`.
 6. Press the desired key combination to create a new shortcut.
@@ -43,6 +50,7 @@ Install the extension by visiting this Chrome Web Store link: **[Chrome Web Stor
 - Move regular tabs around in a window
 - Move pinned tabs around in a window
 - Move multiple highlighted tabs around in a window
+- Move tabs to the start of the list 
 
 ## Development
 
@@ -52,6 +60,7 @@ Install the extension by visiting this Chrome Web Store link: **[Chrome Web Stor
 
 ## Contributors
 
+- Shaun Clowes (@shaun4477)
 - Mohinsh Thallavajhula (@mohnish)
 - Anže Videnič (@avidenic)
 - Sandeep Appikonda (@appikonda)

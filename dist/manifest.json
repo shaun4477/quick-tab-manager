@@ -2,11 +2,11 @@
   "name": "Rearrange Tabs",
   "version": "2.0.0",
   "description": "Allows users to rearrange tabs using keyboard shortcuts",
-  "author": "Mohnish Thallavajhula",
+  "author": "Originally Mohnish Thallavajhula, rewrite Shaun Clowes",
   "manifest_version": 2,
   "short_name": "Rearrange Tabs",
   "background": {
-    "scripts": ["rearrange.js"],
+    "scripts": ["advrearrange.js"],
     "persistent": false
   },
   "commands": {
@@ -25,6 +25,14 @@
         "mac": "MacCtrl+Shift+Right"
       },
       "description": "Move active tab to right"
+    },
+    "move-tab-first": {
+      "suggested_key": {
+        "default": "Shift+Alt+1",
+        "windows": "Shift+Alt+1",
+        "mac": "MacCtrl+Shift+1"
+      },
+      "description": "Move active tab to first"
     }
   },
   "browser_action": {
