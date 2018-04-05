@@ -1,7 +1,7 @@
 dist:
 	@mkdir -p dist
 	@cp icon*.png manifest.json advrearrange.js dist/
-	@zip -r rearrange_tabs.zip dist/
+	@zip -r quick_tab_manager.zip dist/
 
 clean:
 	rm -fr ./dist/
