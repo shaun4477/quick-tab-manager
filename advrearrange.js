@@ -93,10 +93,8 @@
         var oldVersion = localStorage["version"];
         var currentVersion = chrome.runtime.getManifest().version;
         if (!oldVersion || oldVersion != currentVersion) {
-            console.log("New version", oldVersion, currentVersion);
             localStorage["version"] = currentVersion;
         }
-        console.log("Loaded", currentVersion);
     }
 
     main();

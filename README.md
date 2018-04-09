@@ -1,13 +1,13 @@
-# Rearrange Tabs
+# Quick Tab Maanger
 
 ![](http://i.imgur.com/BFar404.png)
 
-Rearrange Tabs is a tiny Google Chrome Extension that allows users
+Quick Tab Manager is a tiny Google Chrome Extension that allows users
 to rearrange the position of the tabs in a window by moving them
 around using keyboard shortcuts.
 
-Rearrange Tabs is originally by Mohinsh Thallavajhula, this version
-has been customized by Shaun Clowes
+Quick Tab Manager is based on Rearrange Tabe by Mohinsh Thallavajhula, 
+this version has been customized by Shaun Clowes
 
 - To move a tab to its left
 
