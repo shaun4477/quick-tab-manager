@@ -89,7 +89,7 @@
         // Add the command listener 
         chrome.commands.onCommand.addListener(commandExec);
 
-        // If the version of the extension is new, show the page
+        // If the version of the extension is new, show the updates page
         var oldVersion = localStorage["version"];
         var currentVersion = chrome.runtime.getManifest().version;
         if (!oldVersion || oldVersion != currentVersion) {
