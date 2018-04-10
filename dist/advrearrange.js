@@ -48,7 +48,7 @@
 
     function moveHighlightedTabsTo(newIndex) {
         return getHighlightedTabs().then((tabs) => {
-            for (var i = tabs.length - 1; i >= 0; i--) 
+            for (let i = tabs.length - 1; i >= 0; i--) 
                 chrome.tabs.move(tabs[i].id, { index: newIndex });
         });
     }
@@ -56,36 +56,50 @@
     function moveHighlightedTabsBy(offset) {
         return getHighlightedTabs().then((tabs) => {
             if (offset < 0) {
-                for (var i = 0; i < tabs.length; i++)
+                for (let i = 0; i < tabs.length; i++)
                     chrome.tabs.move(tabs[i].id, { index: tabs[i].index + offset });
             } else {
-                for (var i = tabs.length - 1; i >= 0; i--) 
+                for (let i = tabs.length - 1; i >= 0; i--) 
                     chrome.tabs.move(tabs[i].id, { index: tabs[i].index + offset });
             }
         });
     }
 
-    // Store tab load time for all current tabs
-    getTabs().then((tabs) => {
-        for (var tab of tabs) {
-            newTab(tab);       
-        } 
-    });
-    
-    global.tabLoadTime = tabLoadTime;
+    function main() {
+        // Store tab load time for all current tabs
+        getTabs().then((tabs) => {
+            for (let tab of tabs) 
+                newTab(tab);       
+        });
+        
+        global.tabLoadTime = tabLoadTime;
 
-    // Register the commands for keyboard shortcuts
-    var commandList = { 'move-tab-first' : () => { moveHighlightedTabsTo(1) },
-                        'move-tab-left':   () => { moveHighlightedTabsBy(-1) },
-                        'move-tab-right':  () => { moveHighlightedTabsBy(1) } };
+        // Register the commands for keyboard shortcuts
+        var commandList = { 'move-tab-first' : () => { moveHighlightedTabsTo(1) },
+                            'move-tab-left':   () => { moveHighlightedTabsBy(-1) },
+                            'move-tab-right':  () => { moveHighlightedTabsBy(1) } };
 
-    function commandExec(command) {
-        if (!(command in commandList))
-            return;
-        commandList[command]();
+        function commandExec(command) {
+            if (!(command in commandList))
+                return;
+            commandList[command]();
+        }
+
+        // Add the command listener 
+        chrome.commands.onCommand.addListener(commandExec);
+
+        // If the version of the extension is new, show the updates page
+        var oldVersion = localStorage["version"];
+        var currentVersion = chrome.runtime.getManifest().version;
+        if (!oldVersion || oldVersion != currentVersion) {
+            localStorage["version"] = currentVersion;
+
+            // Show welcome screen on first install
+            if (oldVersion == null) 
+                chrome.tabs.create({ url: chrome.extension.getURL("welcome.html") });
+        }
     }
 
-    // Add the command listener 
-    chrome.commands.onCommand.addListener(commandExec);
+    main();
 
 })(window);

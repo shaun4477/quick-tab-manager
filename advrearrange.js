@@ -48,7 +48,7 @@
 
     function moveHighlightedTabsTo(newIndex) {
         return getHighlightedTabs().then((tabs) => {
-            for (var i = tabs.length - 1; i >= 0; i--) 
+            for (let i = tabs.length - 1; i >= 0; i--) 
                 chrome.tabs.move(tabs[i].id, { index: newIndex });
         });
     }
@@ -56,10 +56,10 @@
     function moveHighlightedTabsBy(offset) {
         return getHighlightedTabs().then((tabs) => {
             if (offset < 0) {
-                for (var i = 0; i < tabs.length; i++)
+                for (let i = 0; i < tabs.length; i++)
                     chrome.tabs.move(tabs[i].id, { index: tabs[i].index + offset });
             } else {
-                for (var i = tabs.length - 1; i >= 0; i--) 
+                for (let i = tabs.length - 1; i >= 0; i--) 
                     chrome.tabs.move(tabs[i].id, { index: tabs[i].index + offset });
             }
         });
@@ -68,9 +68,8 @@
     function main() {
         // Store tab load time for all current tabs
         getTabs().then((tabs) => {
-            for (var tab of tabs) {
+            for (let tab of tabs) 
                 newTab(tab);       
-            } 
         });
         
         global.tabLoadTime = tabLoadTime;
@@ -94,6 +93,10 @@
         var currentVersion = chrome.runtime.getManifest().version;
         if (!oldVersion || oldVersion != currentVersion) {
             localStorage["version"] = currentVersion;
+
+            // Show welcome screen on first install
+            if (oldVersion == null) 
+                chrome.tabs.create({ url: chrome.extension.getURL("welcome.html") });
         }
     }
 
