@@ -1,6 +1,6 @@
 {
   "name": "Quick Tab Manager",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Rearrange tabs using keyboard shortcuts",
   "author": "Originally Mohnish Thallavajhula, rewrite by Shaun Clowes",
   "manifest_version": 2,
@@ -50,9 +50,6 @@
   },
   "page_action": {
   },
-  // "browser_action": {
-  //  "default_icon": "icon16.png"
-  // },
   "icons": {
     "16": "icon16.png",
     "32": "icon32.png",
