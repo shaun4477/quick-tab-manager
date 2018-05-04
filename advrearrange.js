@@ -10,16 +10,16 @@
 
     chrome.tabs.onCreated.addListener(tab => initTabData(tab.id));
 
-    chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+    chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
         if (changeInfo["status"] == "complete")
             initTabData(tab.id);
     });
 
-    chrome.tabs.onRemoved.addListener(function (tabId, removeInfo) {
+    chrome.tabs.onRemoved.addListener((tabId, removeInfo) => {
         delete tabLoadTimes[tabId];
     });
 
-    chrome.tabs.onReplaced.addListener(function (addedTabId, removedTabId) {
+    chrome.tabs.onReplaced.addListener((addedTabId, removedTabId) => {
         if (removedTabId in tabLoadTimes) {
             tabLoadTimes[addedTabId] = tabLoadTime[removedTabId];
             delete tabLoadTimes[removedTabId];
@@ -80,8 +80,7 @@
                     continue;
                 var toClose = tabs.sort((a, b) => b.time - a.time).slice(1);
                 console.log(url, tabs, toClose);
-                for (let tabToClose of toClose) 
-                    chrome.tabs.remove(tabToClose.id);
+		tabsToClose.forEach(toClose => { chrome.tabs.remove(tabToClose.id) });
             }
         });
     }
@@ -90,10 +89,10 @@
         // Store tab load time for all current tabs
         getTabs().then(tabs => tabs.map(tab => initTabData(tab.id)));
         
-        global.tabLoadTimes = tabLoadTimes;
-        global.getTabs = getTabs;
-        global.getActiveTab = getActiveTab;
-        global.closeDuplicateTabs = closeDuplicateTabs;
+        var exports = { 'tabLoadTimes': tabLoadTimes, 'getTabs': getTabs, 'getActiveTab': getActiveTab, 
+                        'closeDuplicateTabs': closeDuplicateTabs };
+        for (const [name, func] of Object.entries(exports))
+            global[name] = func;
 
         // Register the commands for keyboard shortcuts
         var commandList = { 'move-tab-first' :      () => { moveHighlightedTabsTo(1) },
@@ -122,5 +121,4 @@
     }
 
     main();
-
 })(window);
