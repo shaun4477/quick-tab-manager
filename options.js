@@ -28,9 +28,7 @@
     }
 
     document.querySelector("#tabsPermission").addEventListener("change", (event) => {
-        var checkbox = event.target;
-
-        if (checkbox.checked) 
+        if (event.target.checked) 
             chrome.permissions.request(tabPermissions, updateCheckbox);
         else
             chrome.permissions.remove(tabPermissions, updateCheckbox);

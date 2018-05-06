@@ -69,19 +69,19 @@
 
     function closeDuplicateTabs() {
         getTabs().then(tabs => {
-            var data = tabs.filter(tab => tab.url).reduce((data, tab) => { 
-                (tab.url in data) || (data[tab.url] = []);
-                data[tab.url].push({ id: tab.id, time: tabLoadTimes[tab.id] });
-                return data;
+            var tabsByUrl = tabs.filter(tab => tab.url).reduce((tabsByUrl, tab) => { 
+                (tab.url in tabsByUrl) || (tabsByUrl[tab.url] = []);
+                tabsByUrl[tab.url].push({ id: tab.id, time: tabLoadTimes[tab.id] });
+                return tabsByUrl;
             }, {});
 
-            for (const [url, tabs] of Object.entries(data)) {
+            Object.entries(tabsByUrl).forEach(([url, tabs]) => {
                 if (tabs.length < 2) 
-                    continue;
-                var toClose = tabs.sort((a, b) => b.time - a.time).slice(1);
-                console.log(url, tabs, toClose);
-		tabsToClose.forEach(toClose => { chrome.tabs.remove(tabToClose.id) });
-            }
+                    return;
+                var tabsToClose = tabs.sort((a, b) => b.time - a.time).slice(1);
+                console.log(url, tabs, tabsToClose);
+                tabsToClose.forEach(tabToClose => { chrome.tabs.remove(tabToClose.id) });
+            });
         });
     }
 
@@ -91,8 +91,7 @@
         
         var exports = { 'tabLoadTimes': tabLoadTimes, 'getTabs': getTabs, 'getActiveTab': getActiveTab, 
                         'closeDuplicateTabs': closeDuplicateTabs };
-        for (const [name, func] of Object.entries(exports))
-            global[name] = func;
+        Object.entries(exports).forEach(([name, func]) => global[name] = func);
 
         // Register the commands for keyboard shortcuts
         var commandList = { 'move-tab-first' :      () => { moveHighlightedTabsTo(1) },
@@ -100,13 +99,11 @@
                             'move-tab-right':       () => { moveHighlightedTabsBy(1) }, 
                             'close-duplicate-tabs': closeDuplicateTabs };
 
-        function commandExec(command) {
+        // Add the command listener 
+        chrome.commands.onCommand.addListener((command) => {
             if (command in commandList)
                 return commandList[command]();
-        }
-
-        // Add the command listener 
-        chrome.commands.onCommand.addListener(commandExec);
+        });
 
         // If the version of the extension is new, show the updates page
         var oldVersion = localStorage["version"];
