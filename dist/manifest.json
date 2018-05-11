@@ -1,6 +1,6 @@
 {
   "name": "Quick Tab Manager",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "Rearrange tabs using keyboard shortcuts",
   "author": "Originally Mohnish Thallavajhula, rewrite by Shaun Clowes",
   "manifest_version": 2,
@@ -41,7 +41,7 @@
         "windows": "Shift+Alt+K",
         "mac": "MacCtrl+Shift+K"
       },
-      "description": "Close duplicate tabs leaving just the most recently loaded"
+      "description": "Find duplicate tabs and close all but the most recently loaded"
     }
   },
   "options_ui": {
