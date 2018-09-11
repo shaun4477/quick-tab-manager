@@ -1,12 +1,70 @@
 ;(function (global) {
     var getTimestamp = () => (new Date()).getTime();
+
+    // Tab load times by tab id, tab ids are unique across a browser session so
+    // no need to consider window ids here 
     var tabLoadTimes = {};
+
+    // Order tabs have been activated in, most recent last 
+    var tabActiveOrder = [];
+
+    // Global variable to ignore a tab switch if we initiate it
+    var ignoreTabActivate = null;
+
+    // Global variable to store history position while moving forward/back
+    var historyPosition = undefined;
 
     // Keep load time of tabs. Used to handle close duplicate tab functionality
     // if we are granted the "tabs" permission
     function initTabData(tabId) {
         tabLoadTimes[tabId] = getTimestamp();
     }
+
+    function deleteTabData(tabId) {
+        tabActiveOrder = tabActiveOrder.filter(tabId => tabId != activeInfo.tabId);
+        delete tabLoadTimes[tabId];
+    }
+
+    function getTabActiveOrder() {
+	return tabActiveOrder;
+    }
+
+    function goBackTab() {
+        if (historyPosition === undefined)
+            historyPosition = 0;
+
+        if (historyPosition <= tabActiveOrder.length - 2)
+            historyPosition += 1;
+	goToHistoryPosition(historyPosition);
+    }
+
+    function goForwardTab() {
+	if (!historyPosition)
+	    return; 
+        if (historyPosition >= 1)
+            historyPosition -= 1;
+        goToHistoryPosition(historyPosition);
+    }
+
+    
+    function goToHistoryPosition(historyPosition) {
+        var historyIndex = tabActiveOrder.length - 1 - historyPosition;
+        if (historyIndex >= 0 && historyIndex < tabActiveOrder.length) {
+            var switchTo = tabActiveOrder[historyIndex];
+            ignoreTabActivate = switchTo;
+            chrome.tabs.update(switchTo, { active: true });
+        }
+    }
+
+    chrome.tabs.onActivated.addListener(activeInfo => {
+	if (ignoreTabActivate && activeInfo.tabId == ignoreTabActivate)
+	    return;
+	tabActiveOrder = tabActiveOrder.filter(tabId => tabId != activeInfo.tabId);
+	tabActiveOrder.push(activeInfo.tabId);
+
+	// Reset the history pointer used for moving forward/back
+	historyPosition = undefined;
+    });
 
     chrome.tabs.onCreated.addListener(tab => initTabData(tab.id));
 
@@ -16,13 +74,13 @@
     });
 
     chrome.tabs.onRemoved.addListener((tabId, removeInfo) => {
-        delete tabLoadTimes[tabId];
+    deleteTabData(tabId);
     });
 
     chrome.tabs.onReplaced.addListener((addedTabId, removedTabId) => {
         if (removedTabId in tabLoadTimes) {
             tabLoadTimes[addedTabId] = tabLoadTime[removedTabId];
-            delete tabLoadTimes[removedTabId];
+            deleteTabData(removedTabId);
         } else
             initTabData(addedTabId);
     });
@@ -67,6 +125,9 @@
         });
     }
 
+    /* 
+     * Close any tabs on the same URL in this window 
+     */
     function closeDuplicateTabs() {
         getTabs().then(tabs => {
             var tabsByUrl = tabs.filter(tab => tab.url).reduce((tabsByUrl, tab) => { 
@@ -90,13 +151,15 @@
         getTabs().then(tabs => tabs.map(tab => initTabData(tab.id)));
         
         var exports = { 'tabLoadTimes': tabLoadTimes, 'getTabs': getTabs, 'getActiveTab': getActiveTab, 
-                        'closeDuplicateTabs': closeDuplicateTabs };
+                        'closeDuplicateTabs': closeDuplicateTabs, 'getTabActiveOrder': getTabActiveOrder };
         Object.entries(exports).forEach(([name, func]) => global[name] = func);
 
         // Register the commands for keyboard shortcuts
         var commandList = { 'move-tab-first' :      () => { moveHighlightedTabsTo(1) },
                             'move-tab-left':        () => { moveHighlightedTabsBy(-1) },
                             'move-tab-right':       () => { moveHighlightedTabsBy(1) }, 
+			    'tab-select-back':      () => { goBackTab() },
+			    'tab-select-forward':   () => { goForwardTab() },
                             'close-duplicate-tabs': closeDuplicateTabs };
 
         // Add the command listener 

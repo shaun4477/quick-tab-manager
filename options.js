@@ -9,7 +9,7 @@
 	}
     });
 
-    var tabPermissions = {permissions: ["tabs"]};
+    var tabPermissions = { permissions: ["tabs"] };
 
     function updateCheckbox() {
         chrome.permissions.contains(tabPermissions, (enabled) => {
