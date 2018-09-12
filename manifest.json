@@ -19,6 +19,12 @@
       },
       "description": "Move active tab to first"
     },
+    "move-tab-left": {
+      "description": "Move active tab to left"
+    },
+    "move-tab-right": {
+      "description": "Move active tab to right"
+    },
     "tab-select-back": {
       "suggested_key": {
         "default": "Shift+Alt+B",
@@ -34,6 +40,14 @@
         "mac": "MacCtrl+Shift+N"
       },
       "description": "Go forward in the active tab list"
+    },
+    "close-duplicate-tabs": {
+      "suggested_key": {
+        "default": "Shift+Alt+K",
+        "windows": "Shift+Alt+K",
+        "mac": "MacCtrl+Shift+K"
+      },
+      "description": "Find duplicate tabs and close all but the most recently loaded"
     }
   },
   "options_ui": {

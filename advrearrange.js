@@ -20,9 +20,9 @@
         tabLoadTimes[tabId] = getTimestamp();
     }
 
-    function deleteTabData(tabId) {
-        tabActiveOrder = tabActiveOrder.filter(tabId => tabId != activeInfo.tabId);
-        delete tabLoadTimes[tabId];
+    function deleteTabData(deletedTabId) {
+        tabActiveOrder = tabActiveOrder.filter(tabId => tabId != deletedTabId);
+        delete tabLoadTimes[deletedTabId];
     }
 
     function getTabActiveOrder() {
