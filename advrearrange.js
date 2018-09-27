@@ -26,7 +26,7 @@
     }
 
     function getTabActiveOrder() {
-	return tabActiveOrder;
+        return tabActiveOrder;
     }
 
     function goBackTab() {
@@ -35,12 +35,12 @@
 
         if (historyPosition <= tabActiveOrder.length - 2)
             historyPosition += 1;
-	goToHistoryPosition(historyPosition);
+        goToHistoryPosition(historyPosition);
     }
 
     function goForwardTab() {
-	if (!historyPosition)
-	    return; 
+        if (!historyPosition)
+            return; 
         if (historyPosition >= 1)
             historyPosition -= 1;
         goToHistoryPosition(historyPosition);
@@ -57,13 +57,14 @@
     }
 
     chrome.tabs.onActivated.addListener(activeInfo => {
-	if (ignoreTabActivate && activeInfo.tabId == ignoreTabActivate)
-	    return;
-	tabActiveOrder = tabActiveOrder.filter(tabId => tabId != activeInfo.tabId);
-	tabActiveOrder.push(activeInfo.tabId);
+        if (ignoreTabActivate && activeInfo.tabId == ignoreTabActivate)
+            return;
+        tabActiveOrder = tabActiveOrder.filter(tabId => tabId != activeInfo.tabId);
+        tabActiveOrder.push(activeInfo.tabId);
 
-	// Reset the history pointer used for moving forward/back
-	historyPosition = undefined;
+        // Reset the history pointer used for moving forward/back
+        historyPosition = undefined;
+        ignoreTabActivate = undefined;
     });
 
     chrome.tabs.onCreated.addListener(tab => initTabData(tab.id));
@@ -158,8 +159,8 @@
         var commandList = { 'move-tab-first' :      () => { moveHighlightedTabsTo(1) },
                             'move-tab-left':        () => { moveHighlightedTabsBy(-1) },
                             'move-tab-right':       () => { moveHighlightedTabsBy(1) }, 
-			    'tab-select-back':      () => { goBackTab() },
-			    'tab-select-forward':   () => { goForwardTab() },
+                            'tab-select-back':      () => { goBackTab() },
+                            'tab-select-forward':   () => { goForwardTab() },
                             'close-duplicate-tabs': closeDuplicateTabs };
 
         // Add the command listener 
