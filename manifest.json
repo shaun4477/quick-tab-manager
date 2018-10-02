@@ -5,6 +5,7 @@
   "author": "Originally Mohnish Thallavajhula, rewrite by Shaun Clowes",
   "manifest_version": 2,
   "short_name": "Rearrange Tabs",
+  "permissions": ["storage"],
   "optional_permissions": ["tabs"],
   "background": {
     "scripts": ["advrearrange.js"],

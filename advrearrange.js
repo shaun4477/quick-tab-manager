@@ -23,6 +23,14 @@
     function deleteTabData(deletedTabId) {
         tabActiveOrder = tabActiveOrder.filter(tabId => tabId != deletedTabId);
         delete tabLoadTimes[deletedTabId];
+        chrome.storage.local.set({tabLoadTimes: tabLoadTimes});
+    }
+
+    function updateTabOrder(activeTabId) {
+        tabActiveOrder = tabActiveOrder.filter(tabId => tabId != activeTabId);
+        tabActiveOrder.push(activeTabId);
+        console.log("Tab order", tabActiveOrder);
+        chrome.storage.local.set({tabActiveOrder: tabActiveOrder});
     }
 
     function getTabActiveOrder() {
@@ -59,8 +67,8 @@
     chrome.tabs.onActivated.addListener(activeInfo => {
         if (ignoreTabActivate && activeInfo.tabId == ignoreTabActivate)
             return;
-        tabActiveOrder = tabActiveOrder.filter(tabId => tabId != activeInfo.tabId);
-        tabActiveOrder.push(activeInfo.tabId);
+
+        updateTabOrder(activeInfo.tabId);
 
         // Reset the history pointer used for moving forward/back
         historyPosition = undefined;
@@ -75,7 +83,7 @@
     });
 
     chrome.tabs.onRemoved.addListener((tabId, removeInfo) => {
-    deleteTabData(tabId);
+        deleteTabData(tabId);
     });
 
     chrome.tabs.onReplaced.addListener((addedTabId, removedTabId) => {
@@ -106,6 +114,10 @@
     function getTabs() {
         return queryTabsInActiveWindow({});
     }    
+
+    function groupTabsById(tabs) {
+        return tabs.reduce((o, v) => { o[v.id] = v; return o }, {});
+    }
 
     function moveHighlightedTabsTo(newIndex) {
         return getHighlightedTabs().then(tabs => {
@@ -148,9 +160,6 @@
     }
 
     function main() {
-        // Store tab load time for all current tabs
-        getTabs().then(tabs => tabs.map(tab => initTabData(tab.id)));
-        
         var exports = { 'tabLoadTimes': tabLoadTimes, 'getTabs': getTabs, 'getActiveTab': getActiveTab, 
                         'closeDuplicateTabs': closeDuplicateTabs, 'getTabActiveOrder': getTabActiveOrder };
         Object.entries(exports).forEach(([name, func]) => global[name] = func);
@@ -169,16 +178,31 @@
                 return commandList[command]();
         });
 
-        // If the version of the extension is new, show the updates page
-        var oldVersion = localStorage["version"];
-        var currentVersion = chrome.runtime.getManifest().version;
-        if (!oldVersion || oldVersion != currentVersion) {
-            localStorage["version"] = currentVersion;
-
-            // Show welcome screen on first install
-            if (oldVersion == null) 
+        // When the extension is installed, show the welcome page 
+        chrome.runtime.onInstalled.addListener(reason => {
+            if (reason == chrome.runtime.OnInstalledReason.INSTALL) 
                 chrome.tabs.create({ url: chrome.extension.getURL("welcome.html") });
-        }
+        });
+
+        chrome.runtime.onStartup.addListener(() => {
+            chrome.storage.local.remove(['tabLoadTimes', 'tabActiveOrder']);
+        });
+
+        chrome.storage.local.get({ tabLoadTimes: {}, tabActiveOrder: [] }, items => {
+            tabLoadTimes = items.tabLoadTimes;
+            tabActiveOrder = items.tabActiveOrder; 
+
+            getTabs().then(groupTabsById).then(tabsById => {
+                tabActiveOrder = tabActiveOrder.filter(tabId => tabsById.hasOwnProperty(tabId));
+                Object.keys(tabLoadTimes).filter(tabId => !tabsById.hasOwnProperty(tabId)).forEach(tabId => delete tabLoadTimes[tabId]);
+
+                // Store tab load time for all current tabs
+                Object.keys(tabsById).forEach(tabId => initTabData(tabId));
+
+                console.log("tabActiveOrder", tabActiveOrder);
+                console.log("tabLoadTimes", tabLoadTimes);
+            });
+        });
     }
 
     main();
