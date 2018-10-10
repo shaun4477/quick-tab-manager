@@ -18,6 +18,7 @@
     // if we are granted the "tabs" permission
     function initTabData(tabId) {
         tabLoadTimes[tabId] = getTimestamp();
+        chrome.storage.local.set({tabLoadTimes: tabLoadTimes});
     }
 
     function deleteTabData(deletedTabId) {
@@ -184,23 +185,32 @@
                 chrome.tabs.create({ url: chrome.extension.getURL("welcome.html") });
         });
 
+        // When a new session is started, forget anything we knew about active order
+        // or load times
         chrome.runtime.onStartup.addListener(() => {
             chrome.storage.local.remove(['tabLoadTimes', 'tabActiveOrder']);
         });
 
+        // The background page can be unloaded when not in use, when we're reloaded
+        // keep information we stored
         chrome.storage.local.get({ tabLoadTimes: {}, tabActiveOrder: [] }, items => {
             tabLoadTimes = items.tabLoadTimes;
             tabActiveOrder = items.tabActiveOrder; 
 
             getTabs().then(groupTabsById).then(tabsById => {
+                // Only keep tabs that are still in this session
                 tabActiveOrder = tabActiveOrder.filter(tabId => tabsById.hasOwnProperty(tabId));
                 Object.keys(tabLoadTimes).filter(tabId => !tabsById.hasOwnProperty(tabId)).forEach(tabId => delete tabLoadTimes[tabId]);
 
-                // Store tab load time for all current tabs
-                Object.keys(tabsById).forEach(tabId => initTabData(tabId));
+                // Store tab load time for all current tabs not in storage
+                Object.keys(tabsById).filter(tabId => !tabLoadTimes.hasOwnProperty(tabId)).forEach(tabId => initTabData(tabId));
 
+                console.log("Current tab count", Object.keys(tabsById).length);
                 console.log("tabActiveOrder", tabActiveOrder);
                 console.log("tabLoadTimes", tabLoadTimes);
+                Object.entries(tabLoadTimes).forEach(([tabId, loadTime]) => {
+                    console.log(tabId, new Date(loadTime), tabsById[tabId].title, tabsById[tabId].url);
+                });
             });
         });
     }
