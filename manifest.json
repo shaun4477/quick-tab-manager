@@ -26,6 +26,12 @@
     "move-tab-right": {
       "description": "Move active tab to right"
     },
+    "tab-select-previous": {
+      "description": "Select tab to left of current tab"
+    },
+    "tab-select-next": {
+      "description": "Select tab to right of current tab"
+    },
     "tab-select-back": {
       "suggested_key": {
         "default": "Shift+Alt+B",

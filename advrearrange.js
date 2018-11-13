@@ -65,6 +65,21 @@
         }
     }
 
+    function selectTab(position) {
+        getActiveTab().then(activeTab => {
+            queryTabs({ windowId: activeTab.windowId })
+                .then(tabs => tabs.sort((a, b) => a.index - b.index))
+                .then(tabs => { 
+                    var newIndex = activeTab.index + position;
+                    if (newIndex < 0) 
+                        newIndex = tabs.length - 1;
+                    else if (newIndex >= tabs.length)
+                        newIndex = 0;
+                    chrome.tabs.update(tabs[newIndex].id, { active: true });
+                });
+        });
+    }
+
     chrome.tabs.onActivated.addListener(activeInfo => {
         if (ignoreTabActivate && activeInfo.tabId == ignoreTabActivate)
             return;
@@ -94,6 +109,12 @@
         } else
             initTabData(addedTabId);
     });
+
+    function queryTabs(query) {
+        return new Promise((accept, reject) => {
+            chrome.tabs.query(query, tabs => accept(tabs));
+        });
+    }
 
     function queryTabsInActiveWindow(query) {
         return new Promise((accept, reject) => {
@@ -162,15 +183,18 @@
 
     function main() {
         var exports = { 'tabLoadTimes': tabLoadTimes, 'getTabs': getTabs, 'getActiveTab': getActiveTab, 
-                        'closeDuplicateTabs': closeDuplicateTabs, 'getTabActiveOrder': getTabActiveOrder };
+                        'closeDuplicateTabs': closeDuplicateTabs, 'getTabActiveOrder': getTabActiveOrder,
+                        'queryTabs': queryTabs };
         Object.entries(exports).forEach(([name, func]) => global[name] = func);
 
         // Register the commands for keyboard shortcuts
         var commandList = { 'move-tab-first' :      () => { moveHighlightedTabsTo(1) },
                             'move-tab-left':        () => { moveHighlightedTabsBy(-1) },
                             'move-tab-right':       () => { moveHighlightedTabsBy(1) }, 
-                            'tab-select-back':      () => { goBackTab() },
-                            'tab-select-forward':   () => { goForwardTab() },
+                            'tab-select-previous':  () => { selectTab(-1) },
+                            'tab-select-next':      () => { selectTab(1) },
+                            'tab-select-back':      goBackTab,
+                            'tab-select-forward':   goForwardTab,
                             'close-duplicate-tabs': closeDuplicateTabs };
 
         // Add the command listener 
