@@ -65,8 +65,6 @@
     "default_title": "Quick tab manager",
     "default_popup": "options.html"
   },
-  "__page_action": {
-  },
   "icons": {
     "16": "icon16.png",
     "32": "icon32.png",
