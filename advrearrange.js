@@ -166,8 +166,9 @@
     function closeDuplicateTabs() {
         getTabs().then(tabs => {
             var tabsByUrl = tabs.filter(tab => tab.url).reduce((tabsByUrl, tab) => { 
-                (tab.url in tabsByUrl) || (tabsByUrl[tab.url] = []);
-                tabsByUrl[tab.url].push({ id: tab.id, time: tabLoadTimes[tab.id] });
+                var url = tab.url.split("#", 1)[0];
+                (url in tabsByUrl) || (tabsByUrl[url] = []);
+                tabsByUrl[url].push({ id: tab.id, time: tabLoadTimes[tab.id] });
                 return tabsByUrl;
             }, {});
 
